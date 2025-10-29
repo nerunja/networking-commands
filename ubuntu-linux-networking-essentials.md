@@ -44,6 +44,16 @@ ip neigh show              # ARP/ND cache
 ip -j a | jq .             # JSON for scripts (install jq first)
 ```
 
+### 1.1.1 Public IP check
+
+To find your public (external) IP address:
+
+```bash
+curl ifconfig.me
+```
+
+Or visit https://ifconfig.me/ in a browser.
+
 ### 1.2 Connectivity tests (`ping`, `tracepath`, `traceroute`, `mtr`)
 ```bash
 ping -c4 8.8.8.8                 # ICMP reachability
