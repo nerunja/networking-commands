@@ -12,19 +12,9 @@ Pick a port (e.g., `5000`). **Host A** listens, **Host B** connects.
 
 | Purpose | Host A (listener) | Host B (connector) |
 |---|---|---|
-| TCP chat | ```bash
-nc -l 5000
-``` | ```bash
-nc <HOST_A_IP> 5000
-``` |
-| UDP chat | ```bash
-nc -u -l 5000
-``` | ```bash
-nc -u <HOST_A_IP> 5000
-``` |
-| Keep accepting sequential clients | ```bash
-nc -lk 5000
-``` | _same as above_ |
+| TCP chat | ```bash nc -l 5000``` | ```bashnc <HOST_A_IP> 5000``` |
+| UDP chat | ```bashnc -u -l 5000``` | ```bashnc -u <HOST_A_IP> 5000``` |
+| Keep accepting sequential clients | ```bashnc -lk 5000``` | _same as above_ |
 | Prefer IPv6 | add `-6` | add `-6` |
 
 Type in either terminal; text appears on the other side. **Ctrl+C** to quit.  
