@@ -2,7 +2,7 @@
 
 #############################################
 # VLAN-Aware Bridge Network Setup Script
-# 
+#
 # Purpose: Creates isolated network namespaces with
 #          proper VLAN tagging for inter-VLAN routing
 #
@@ -250,3 +250,124 @@ echo "  - Capture traffic:        sudo tcpdump -i br0 -n -e"
 echo "  - Run cleanup script:     sudo ./cleanup.sh"
 echo ""
 print_success "VLAN-aware bridge network setup completed successfully!"
+
+#############################################
+# Expected Output:
+# ➜  vlan git:(main) sudo ./vlan-aware-bridge-setup.sh
+# === Starting VLAN-Aware Bridge Network Setup ===
+#
+# === Cleaning Up Existing Setup ===
+# ⚠️  Removed existing pc10 namespace
+# ⚠️  Removed existing pc20 namespace
+# ⚠️  Removed existing router namespace
+# ⚠️  Removed existing br0 bridge
+#
+# === Creating Network Namespaces ===
+# ✅ Created namespace: pc10
+# ✅ Created namespace: pc20
+# ✅ Created namespace: router
+#
+# === Creating Virtual Ethernet Pairs ===
+# ✅ Created veth pair: veth-pc10 <-> veth-sw10
+# ✅ Created veth pair: veth-pc20 <-> veth-sw20
+# ✅ Created veth pair: veth-trunk <-> veth-router
+#
+# === Moving Interfaces to Namespaces ===
+# ✅ Moved veth-pc10 to pc10 namespace
+# ✅ Moved veth-pc20 to pc20 namespace
+# ✅ Moved veth-router to router namespace
+#
+# === Creating VLAN-Aware Bridge ===
+# ✅ Created bridge: br0 (VLAN filtering enabled)
+#
+# === Adding Ports to Bridge ===
+# ✅ Added veth-sw10 to br0
+# ✅ Added veth-sw20 to br0
+# ✅ Added veth-trunk to br0
+#
+# === Bringing Up Switch-Side Interfaces ===
+# ✅ All switch-side interfaces are UP
+#
+# === Configuring VLANs on Bridge Ports ===
+# Configuring veth-sw10 as ACCESS port for VLAN 10...
+# ✅ veth-sw10: ACCESS port VLAN 10 (pvid untagged)
+# Configuring veth-sw20 as ACCESS port for VLAN 20...
+# ✅ veth-sw20: ACCESS port VLAN 20 (pvid untagged)
+# Configuring veth-trunk as TRUNK port for VLANs 10 and 20...
+# ✅ veth-trunk: TRUNK port VLANs 10,20 (tagged)
+# Configuring bridge itself...
+# ✅ Bridge br0: VLANs 10,20 configured
+#
+# === Configuring PC10 (VLAN 10) ===
+# ✅ PC10: 192.168.10.10/24 (gateway: 192.168.10.1)
+#
+# === Configuring PC20 (VLAN 20) ===
+# ✅ PC20: 192.168.20.20/24 (gateway: 192.168.20.1)
+#
+# === Configuring Router ===
+# ✅ Router trunk interface UP
+# Creating VLAN sub-interfaces...
+# ✅ Created VLAN sub-interfaces: veth-router.10, veth-router.20
+# Assigning IP addresses...
+# ✅ Router IPs: 192.168.10.1/24 (VLAN 10), 192.168.20.1/24 (VLAN 20)
+# Bringing up router interfaces...
+# ✅ All router interfaces UP
+# Enabling IP forwarding...
+# ✅ IP forwarding enabled
+#
+# === Setup Complete! ===
+#
+# === VLAN Configuration on Bridge ===
+# port              vlan-id
+# virbr0            1 PVID Egress Untagged
+# br-7683d5f83300   1 PVID Egress Untagged
+# docker0           1 PVID Egress Untagged
+# veth-sw10         10 PVID Egress Untagged
+# veth-sw20         20 PVID Egress Untagged
+# veth-trunk        10
+#                   20
+# br0               10
+#                   20
+#
+# === Router Interface Configuration ===
+#     inet 127.0.0.1/8 scope host lo
+# 2: veth-router.10@veth-router: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP group default qlen 1000
+#     inet 192.168.10.1/24 scope global veth-router.10
+# 3: veth-router.20@veth-router: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP group default qlen 1000
+#     inet 192.168.20.1/24 scope global veth-router.20
+# 17: veth-router@if18: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP group default qlen 1000
+#
+# === Network Topology Summary ===
+# ┌─────────────────────────────────────────────────────────────┐
+# │  PC10 (192.168.10.10) ─┐                                   │
+# │         VLAN 10         ├─→ VLAN-aware Bridge ─→ Router    │
+# │  PC20 (192.168.20.20) ─┘      (br0)           (forwards)   │
+# └─────────────────────────────────────────────────────────────┘
+#
+# === Running Connectivity Tests ===
+#
+# Test 1: PC10 → Router Gateway (VLAN 10)
+# ✅ PC10 can reach router (192.168.10.1)
+#
+# Test 2: PC20 → Router Gateway (VLAN 20)
+# ✅ PC20 can reach router (192.168.20.1)
+#
+# Test 3: Inter-VLAN Routing (PC10 → PC20)
+# ✅ PC10 can reach PC20 (192.168.20.20) via router
+#
+# Test 4: Inter-VLAN Routing (PC20 → PC10)
+# ✅ PC20 can reach PC10 (192.168.10.10) via router
+#
+# === All Tests Complete! ===
+#
+# Useful commands:
+#   - List namespaces:        sudo ip netns list
+#   - Check VLAN config:      sudo bridge vlan show
+#   - Test PC10 → PC20:       sudo ip netns exec pc10 ping 192.168.20.20
+#   - Enter PC10 shell:       sudo ip netns exec pc10 bash
+#   - Capture traffic:        sudo tcpdump -i br0 -n -e
+#   - Run cleanup script:     sudo ./cleanup.sh
+#
+# ✅ VLAN-aware bridge network setup completed successfully!
+# ➜  vlan git:(main)
+#############################################
