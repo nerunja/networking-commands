@@ -32,7 +32,7 @@ cd ~/ws/github/nerunja/networking-commands/OpenVPN/scripts
 
 **When prompted, enter:**
 - **Client name:** `android-phone` or `nerunja-phone`
-- **Server address:** `nerunja.mywire.org` (your DDNS domain)
+- **Server address:** `<your-name>.mywire.org` (your DDNS domain)
 - **CA password:** (the password you set during setup)
 
 **Output file:** `~/client-configs/android-phone.ovpn`
