@@ -217,8 +217,8 @@ sudo systemctl stop openvpn-server@server
 ```
 
 **You'll be asked for:**
-1. **Client name:** e.g., `nerunja-laptop`, `work-phone`, `tablet`
-2. **Server address:** Your public IP or DDNS domain (e.g., `nerunja.mywire.org`)
+1. **Client name:** e.g., `my-laptop`, `work-phone`, `tablet`
+2. **Server address:** Your public IP or DDNS domain (e.g., `home.mywire.org`)
 
 You'll need your **CA password** again.
 
