@@ -27,7 +27,18 @@ echo ""
 
 # Update package list
 echo "Step 1: Updating package list..."
-apt update
+if ! apt update 2>&1 | tee /tmp/apt-update.log; then
+    echo "⚠️  Warning: Package update encountered errors"
+    if grep -q "does not have a Release file" /tmp/apt-update.log; then
+        echo "   Some repositories are misconfigured. Check /etc/apt/sources.list.d/"
+    fi
+    read -p "Continue anyway? (yes/no): " continue_install
+    if [ "$continue_install" != "yes" ]; then
+        rm -f /tmp/apt-update.log
+        exit 1
+    fi
+fi
+rm -f /tmp/apt-update.log
 echo "✓ Package list updated"
 echo ""
 

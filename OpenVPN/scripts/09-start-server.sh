@@ -71,12 +71,18 @@ echo ""
 STATUS=$(systemctl is-active openvpn-server@server)
 echo "  Service status: $STATUS"
 
-# Check for initialization completion
-if journalctl -u openvpn-server@server -n 50 --no-pager | grep -q "Initialization Sequence Completed"; then
-    echo "  ✓ Server initialization: Complete"
-else
-    echo "  ⚠️  Warning: Initialization may not be complete"
-fi
+# Check for initialization completion (wait up to 10 seconds)
+for i in {1..10}; do
+    if journalctl -u openvpn-server@server -n 100 --no-pager | grep -q "Initialization Sequence Completed"; then
+        echo "  ✓ Server initialization: Complete"
+        break
+    fi
+    if [ $i -eq 10 ]; then
+        echo "  ⚠️  Warning: Initialization may not be complete (check logs)"
+    else
+        sleep 1
+    fi
+done
 
 # Check TUN interface
 if ip addr show tun0 > /dev/null 2>&1; then

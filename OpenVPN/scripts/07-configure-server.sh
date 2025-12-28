@@ -39,12 +39,36 @@ port=${port:-1194}
 read -p "Protocol (udp/tcp) [udp]: " protocol
 protocol=${protocol:-udp}
 
-read -p "DNS server 1 [8.8.8.8]: " dns1
-dns1=${dns1:-8.8.8.8}
+echo ""
+echo "DNS Server Options:"
+echo "  1. Google (8.8.8.8, 8.8.4.4) - Fast, widely used"
+echo "  2. Cloudflare (1.1.1.1, 1.0.0.1) - Privacy-focused (Default)"
+echo "  3. Quad9 (9.9.9.9, 149.112.112.112) - Security-focused, blocks malware"
+echo "  4. Custom"
+echo ""
+read -p "Select DNS option [1-4] (default: 2): " dns_choice
+dns_choice=${dns_choice:-2}
 
-read -p "DNS server 2 [8.8.4.4]: " dns2
-dns2=${dns2:-8.8.4.4}
+case $dns_choice in
+    1)
+        dns1="8.8.8.8"
+        dns2="8.8.4.4"
+        ;;
+    2)
+        dns1="1.1.1.1"
+        dns2="1.0.0.1"
+        ;;
+    3)
+        dns1="9.9.9.9"
+        dns2="149.112.112.112"
+        ;;
+    4)
+        read -p "DNS server 1: " dns1
+        read -p "DNS server 2: " dns2
+        ;;
+esac
 
+echo ""
 read -p "Maximum clients [10]: " max_clients
 max_clients=${max_clients:-10}
 
@@ -104,6 +128,7 @@ auth SHA256
 data-ciphers AES-256-GCM:AES-128-GCM:AES-256-CBC
 
 # Compression
+allow-compression yes
 compress lz4-v2
 push "compress lz4-v2"
 
@@ -132,10 +157,18 @@ echo ""
 
 # Verify configuration syntax
 echo "Step 2: Verifying configuration syntax..."
-if openvpn --config /etc/openvpn/server/server.conf --test-crypto > /dev/null 2>&1; then
-    echo "✓ Configuration syntax valid"
+if openvpn --config /etc/openvpn/server/server.conf --test-crypto 2>&1 | tee /tmp/openvpn-test.log | grep -q "FAILED"; then
+    echo "✗ Configuration test failed!"
+    cat /tmp/openvpn-test.log
+    rm -f /tmp/openvpn-test.log
+    exit 1
 else
-    echo "⚠️  Warning: Configuration test returned warnings (this is often normal)"
+    echo "✓ Configuration syntax valid"
+    if grep -qi "warning" /tmp/openvpn-test.log; then
+        echo "⚠️  Warnings detected:"
+        grep -i "warning" /tmp/openvpn-test.log
+    fi
+    rm -f /tmp/openvpn-test.log
 fi
 
 echo ""
