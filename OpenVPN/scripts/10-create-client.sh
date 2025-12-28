@@ -292,7 +292,7 @@ echo ""
 # Create helper script for future clients
 echo "Creating helper script..."
 
-cat > ~/add-client.sh << 'EOFSCRIPT'
+cat > ./add-client.sh << 'EOFSCRIPT'
 #!/bin/bash
 # add-client.sh - Quick client generation script
 
@@ -381,9 +381,9 @@ EOF
 echo "✓ Client created: ~/client-configs/$CLIENT_NAME.ovpn"
 EOFSCRIPT
 
-chmod +x ~/add-client.sh
+chmod +x ./add-client.sh
 
-echo "✓ Helper script created: ~/add-client.sh"
+echo "✓ Helper script created: ./add-client.sh"
 echo ""
 echo "═══════════════════════════════════════════════════════════"
 echo "✓ Setup Complete!"
@@ -395,7 +395,7 @@ echo "Summary:"
 echo "  ✓ Server running on port $SERVER_PORT ($SERVER_PROTO)"
 echo "  ✓ First client created: $CLIENT_NAME"
 echo "  ✓ Config file ready: ~/client-configs/$CLIENT_NAME.ovpn"
-echo "  ✓ Helper script created: ~/add-client.sh"
+echo "  ✓ Helper script created: ./add-client.sh"
 echo ""
 echo "Next steps:"
 echo "  1. Transfer $CLIENT_NAME.ovpn to your device securely"

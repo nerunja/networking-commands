@@ -233,7 +233,7 @@ Creates first VPN client configuration.
 
 **Output:**
 - `~/client-configs/client-name.ovpn`
-- `~/add-client.sh` (helper for more clients)
+- `./add-client.sh` (helper for more clients)
 
 ## After Setup
 
@@ -276,6 +276,7 @@ ping 10.8.0.1
 ./10-create-client.sh
 
 # Option 2: Use the helper script (created by step 10)
+cd ~/ws/github/nerunja/networking-commands/OpenVPN/scripts
 ./add-client.sh phone
 ./add-client.sh tablet
 ./add-client.sh work-laptop

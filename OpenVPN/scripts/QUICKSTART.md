@@ -333,8 +333,9 @@ nslookup google.com
 
 **Option 2:** Use the helper script (created automatically)
 ```bash
-~/add-client.sh phone
-~/add-client.sh tablet
+cd ~/ws/github/nerunja/networking-commands/OpenVPN/scripts
+./add-client.sh phone
+./add-client.sh tablet
 ```
 
 Each client gets a unique certificate and can connect simultaneously (up to max clients configured).
@@ -540,7 +541,7 @@ sudo ./09-start-server.sh
 ```bash
 ./10-create-client.sh
 # OR
-~/add-client.sh client-name
+./add-client.sh client-name
 ```
 
 ### Test Connection
