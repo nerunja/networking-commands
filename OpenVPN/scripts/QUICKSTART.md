@@ -217,8 +217,8 @@ sudo systemctl stop openvpn-server@server
 ```
 
 **You'll be asked for:**
-1. **Client name:** e.g., `my-laptop`, `work-phone`, `tablet`
-2. **Server address:** Your public IP or DDNS domain (e.g., `home.mywire.org`)
+1. **Client name:** e.g., `nerunja-laptop`, `work-phone`, `tablet`
+2. **Server address:** Your public IP or DDNS domain (e.g., `nerunja.mywire.org`)
 
 You'll need your **CA password** again.
 
@@ -333,9 +333,8 @@ nslookup google.com
 
 **Option 2:** Use the helper script (created automatically)
 ```bash
-cd ~/ws/github/nerunja/networking-commands/OpenVPN/scripts
-./add-client.sh phone
-./add-client.sh tablet
+~/add-client.sh phone
+~/add-client.sh tablet
 ```
 
 Each client gets a unique certificate and can connect simultaneously (up to max clients configured).
@@ -541,7 +540,7 @@ sudo ./09-start-server.sh
 ```bash
 ./10-create-client.sh
 # OR
-./add-client.sh client-name
+~/add-client.sh client-name
 ```
 
 ### Test Connection
