@@ -47,7 +47,7 @@ This guide covers setting up NGINX as a reverse proxy to access multiple service
                              │
 ┌────────────────────────────▼────────────────────────────────────┐
 │                   OpenVPN Server                                 │
-│              (nerunja.mywire.org / itekk.in)                    │
+│              (vpnserver.example.org / example.com)              │
 └────────────────────────────┬────────────────────────────────────┘
                              │
                              │ VPN Tunnel (10.8.0.0/24)
@@ -75,7 +75,7 @@ This guide covers setting up NGINX as a reverse proxy to access multiple service
 
 1. **External Client** → Connects to OpenVPN server
 2. **OpenVPN** → Assigns client an IP in VPN subnet (10.8.0.x)
-3. **Client** → Accesses NGINX at `langflow.itekk.in` or `192.168.1.x:8001`
+3. **Client** → Accesses NGINX at `langflow.example.com` or `192.168.1.x:8001`
 4. **NGINX** → Routes request to appropriate internal service
 5. **Internal Service** → Processes request and returns response
 6. **NGINX** → Adds proper headers and returns to client
@@ -116,7 +116,7 @@ This guide covers setting up NGINX as a reverse proxy to access multiple service
 ✅ **CORS Handling**: Adds proper headers to allow cross-origin requests  
 ✅ **Port Consolidation**: All services accessible through port 80/443  
 ✅ **SSL/TLS**: Single point for certificate management  
-✅ **Clean URLs**: `https://langflow.itekk.in` instead of `http://192.168.1.10:7860`  
+✅ **Clean URLs**: `https://langflow.example.com` instead of `http://192.168.1.10:7860`
 ✅ **Security Layer**: Add authentication, rate limiting, IP filtering  
 ✅ **Load Balancing**: Distribute traffic across multiple instances  
 ✅ **Caching**: Improve performance for static content  
@@ -146,8 +146,8 @@ This guide covers setting up NGINX as a reverse proxy to access multiple service
 
 ### Network Information Needed
 
-- VPN server IP/hostname: `nerunja.mywire.org`
-- Domain name: `itekk.in`
+- VPN server IP/hostname: `vpnserver.example.org`
+- Domain name: `example.com`
 - NGINX server LAN IP: `192.168.1.x` (choose available IP)
 - Service IPs and ports:
   - Langflow: `192.168.1.10:7860`
@@ -255,9 +255,9 @@ You have two main approaches for routing traffic to your services:
 - **Best for**: Production use, multiple users, public-facing services
 
 **URL Examples:**
-- `https://langflow.itekk.in` → Langflow
-- `https://app1.itekk.in` → Service 2
-- `https://app2.itekk.in` → Service 3
+- `https://langflow.example.com` → Langflow
+- `https://app1.example.com` → Service 2
+- `https://app2.example.com` → Service 3
 
 **Recommendation**: Start with **Port-Based** for immediate functionality, migrate to **Subdomain-Based** for production use.
 
@@ -460,12 +460,12 @@ http://192.168.1.x:8000/health
 ### 1. DNS Prerequisites
 
 Before proceeding, ensure you have:
-- Domain name: `itekk.in`
-- Access to DNS management (GoDaddy)
+- Domain name: `example.com`
+- Access to DNS management (your DNS provider)
 - Decide on subdomain names:
-  - `langflow.itekk.in`
-  - `app1.itekk.in`
-  - `app2.itekk.in`
+  - `langflow.example.com`
+  - `app1.example.com`
+  - `app2.example.com`
 
 ### 2. Create Configuration File
 
@@ -478,12 +478,12 @@ sudo nano /etc/nginx/sites-available/home-services-subdomains
 
 ```nginx
 # =============================================================================
-# Langflow Service - langflow.itekk.in
+# Langflow Service - langflow.example.com
 # =============================================================================
 server {
     listen 80;
     listen [::]:80;
-    server_name langflow.itekk.in;
+    server_name langflow.example.com;
     
     # Logging
     access_log /var/log/nginx/langflow-access.log;
@@ -536,12 +536,12 @@ server {
 }
 
 # =============================================================================
-# Service 2 - app1.itekk.in
+# Service 2 - app1.example.com
 # =============================================================================
 server {
     listen 80;
     listen [::]:80;
-    server_name app1.itekk.in;
+    server_name app1.example.com;
     
     access_log /var/log/nginx/app1-access.log;
     error_log /var/log/nginx/app1-error.log;
@@ -563,12 +563,12 @@ server {
 }
 
 # =============================================================================
-# Service 3 - app2.itekk.in
+# Service 3 - app2.example.com
 # =============================================================================
 server {
     listen 80;
     listen [::]:80;
-    server_name app2.itekk.in;
+    server_name app2.example.com;
     
     access_log /var/log/nginx/app2-access.log;
     error_log /var/log/nginx/app2-error.log;
@@ -624,9 +624,9 @@ sudo nano /etc/hosts
 Add entries:
 ```
 # Local service routing
-127.0.0.1   langflow.itekk.in
-127.0.0.1   app1.itekk.in
-127.0.0.1   app2.itekk.in
+127.0.0.1   langflow.example.com
+127.0.0.1   app1.example.com
+127.0.0.1   app2.example.com
 ```
 
 **OR** use dnsmasq for local DNS:
@@ -642,9 +642,9 @@ sudo nano /etc/dnsmasq.conf
 Add:
 ```
 # Local DNS entries
-address=/langflow.itekk.in/192.168.1.x
-address=/app1.itekk.in/192.168.1.x
-address=/app2.itekk.in/192.168.1.x
+address=/langflow.example.com/192.168.1.x
+address=/app1.example.com/192.168.1.x
+address=/app2.example.com/192.168.1.x
 ```
 
 ```bash
@@ -681,16 +681,16 @@ sudo systemctl stop nginx
 
 # Get certificates for all subdomains at once
 sudo certbot certonly --standalone \
-  -d langflow.itekk.in \
-  -d app1.itekk.in \
-  -d app2.itekk.in \
+  -d langflow.example.com \
+  -d app1.example.com \
+  -d app2.example.com \
   --email your-email@example.com \
   --agree-tos
 
 # OR get them individually
-sudo certbot certonly --standalone -d langflow.itekk.in
-sudo certbot certonly --standalone -d app1.itekk.in
-sudo certbot certonly --standalone -d app2.itekk.in
+sudo certbot certonly --standalone -d langflow.example.com
+sudo certbot certonly --standalone -d app1.example.com
+sudo certbot certonly --standalone -d app2.example.com
 
 # Start NGINX
 sudo systemctl start nginx
@@ -706,11 +706,11 @@ Update each server block to use SSL:
 server {
     listen 443 ssl http2;
     listen [::]:443 ssl http2;
-    server_name langflow.itekk.in;
-    
+    server_name langflow.example.com;
+
     # SSL Certificate paths
-    ssl_certificate /etc/letsencrypt/live/langflow.itekk.in/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/langflow.itekk.in/privkey.pem;
+    ssl_certificate /etc/letsencrypt/live/langflow.example.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/langflow.example.com/privkey.pem;
     
     # SSL Configuration
     ssl_protocols TLSv1.2 TLSv1.3;
@@ -722,7 +722,7 @@ server {
     # OCSP Stapling
     ssl_stapling on;
     ssl_stapling_verify on;
-    ssl_trusted_certificate /etc/letsencrypt/live/langflow.itekk.in/chain.pem;
+    ssl_trusted_certificate /etc/letsencrypt/live/langflow.example.com/chain.pem;
     
     # Security headers
     add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
@@ -763,7 +763,7 @@ server {
 server {
     listen 80;
     listen [::]:80;
-    server_name langflow.itekk.in;
+    server_name langflow.example.com;
     
     # Redirect all HTTP to HTTPS
     return 301 https://$server_name$request_uri;
@@ -798,7 +798,7 @@ sudo mkdir -p /etc/nginx/ssl
 sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
   -keyout /etc/nginx/ssl/nginx-selfsigned.key \
   -out /etc/nginx/ssl/nginx-selfsigned.crt \
-  -subj "/C=IN/ST=TamilNadu/L=Chennai/O=HomeNetwork/CN=*.itekk.in"
+  -subj "/C=US/ST=State/L=City/O=HomeNetwork/CN=*.example.com"
 
 # Generate Diffie-Hellman parameters (takes a few minutes)
 sudo openssl dhparam -out /etc/nginx/ssl/dhparam.pem 2048
@@ -845,7 +845,7 @@ Update server block:
 server {
     listen 443 ssl http2;
     listen [::]:443 ssl http2;
-    server_name langflow.itekk.in;
+    server_name langflow.example.com;
     
     include snippets/self-signed.conf;
     include snippets/ssl-params.conf;
@@ -872,7 +872,7 @@ server {
 server {
     listen 80;
     listen [::]:80;
-    server_name langflow.itekk.in;
+    server_name langflow.example.com;
     return 301 https://$server_name$request_uri;
 }
 ```
@@ -883,11 +883,11 @@ server {
 
 ## DNS Configuration
 
-### Public DNS (GoDaddy)
+### Public DNS (Your DNS Provider)
 
 If you want services accessible from internet (through VPN):
 
-1. **Login to GoDaddy DNS Management**
+1. **Login to Your DNS Provider's Management Panel**
 2. **Add A Records:**
 
 ```
@@ -907,8 +907,8 @@ A       *           <your-public-IP>           600
 
 ```bash
 # Check DNS records
-nslookup langflow.itekk.in
-dig langflow.itekk.in
+nslookup langflow.example.com
+dig langflow.example.com
 
 # Check from online tools
 # https://dnschecker.org
@@ -925,9 +925,9 @@ On each VPN client device:
 **Windows:**
 ```
 # Edit: C:\Windows\System32\drivers\etc\hosts
-192.168.1.x    langflow.itekk.in
-192.168.1.x    app1.itekk.in
-192.168.1.x    app2.itekk.in
+192.168.1.x    langflow.example.com
+192.168.1.x    app1.example.com
+192.168.1.x    app2.example.com
 ```
 
 **Linux/Mac:**
@@ -935,9 +935,9 @@ On each VPN client device:
 sudo nano /etc/hosts
 
 # Add:
-192.168.1.x    langflow.itekk.in
-192.168.1.x    app1.itekk.in
-192.168.1.x    app2.itekk.in
+192.168.1.x    langflow.example.com
+192.168.1.x    app1.example.com
+192.168.1.x    app2.example.com
 ```
 
 #### Method 2: Local DNS Server (Better for Multiple Clients)
@@ -958,12 +958,12 @@ listen-address=127.0.0.1
 listen-address=192.168.1.x
 
 # DNS entries
-address=/langflow.itekk.in/192.168.1.x
-address=/app1.itekk.in/192.168.1.x
-address=/app2.itekk.in/192.168.1.x
+address=/langflow.example.com/192.168.1.x
+address=/app1.example.com/192.168.1.x
+address=/app2.example.com/192.168.1.x
 
 # Or wildcard
-address=/.itekk.in/192.168.1.x
+address=/.example.com/192.168.1.x
 
 # Upstream DNS
 server=8.8.8.8
@@ -979,7 +979,7 @@ sudo systemctl restart dnsmasq
 sudo systemctl enable dnsmasq
 
 # Verify
-dig @192.168.1.x langflow.itekk.in
+dig @192.168.1.x langflow.example.com
 ```
 
 **Configure OpenVPN to push DNS:**
@@ -1092,7 +1092,7 @@ sudo nano /etc/nginx/snippets/cors.conf
 set $cors_origin "*";
 
 # For specific origins, use:
-# if ($http_origin ~* (https?://langflow\.itekk\.in|https?://app1\.itekk\.in)) {
+# if ($http_origin ~* (https?://langflow\.example\.com|https?://app1\.example\.com)) {
 #     set $cors_origin $http_origin;
 # }
 
@@ -1125,7 +1125,7 @@ if ($request_method = 'OPTIONS') {
 ```nginx
 server {
     listen 80;
-    server_name langflow.itekk.in;
+    server_name langflow.example.com;
 
     location / {
         # Include CORS configuration
@@ -1152,7 +1152,7 @@ curl -H "Origin: http://example.com" \
      -H "Access-Control-Request-Method: POST" \
      -H "Access-Control-Request-Headers: Content-Type" \
      -X OPTIONS --verbose \
-     http://langflow.itekk.in
+     http://langflow.example.com
 
 # Expected headers in response:
 # Access-Control-Allow-Origin: *
@@ -1312,28 +1312,28 @@ sudo systemctl reload nginx
 ```bash
 # Test from NGINX server itself
 curl -I http://localhost:8001
-curl -I http://langflow.itekk.in
+curl -I http://langflow.example.com
 
 # Test from another device on LAN
 curl -I http://192.168.1.x:8001
-curl -I http://langflow.itekk.in
+curl -I http://langflow.example.com
 
 # Test HTTPS
-curl -I https://langflow.itekk.in
+curl -I https://langflow.example.com
 
 # Test with verbose output
-curl -v http://langflow.itekk.in
+curl -v http://langflow.example.com
 ```
 
 ### 2. Test CORS Headers
 
 ```bash
 # Test CORS preflight
-curl -H "Origin: http://example.com" \
+curl -H "Origin: http://test.com" \
      -H "Access-Control-Request-Method: POST" \
      -H "Access-Control-Request-Headers: Content-Type,Authorization" \
      -X OPTIONS --verbose \
-     http://langflow.itekk.in
+     http://langflow.example.com
 
 # Check for these headers in response:
 # Access-Control-Allow-Origin
@@ -1351,21 +1351,21 @@ cargo install websocat
 npm install -g wscat
 
 # Test WebSocket
-wscat -c ws://langflow.itekk.in/ws
+wscat -c ws://langflow.example.com/ws
 ```
 
 ### 4. Test SSL/TLS Configuration
 
 ```bash
 # Test SSL configuration
-openssl s_client -connect langflow.itekk.in:443 -servername langflow.itekk.in
+openssl s_client -connect langflow.example.com:443 -servername langflow.example.com
 
 # Check certificate
-openssl s_client -connect langflow.itekk.in:443 -servername langflow.itekk.in | openssl x509 -noout -text
+openssl s_client -connect langflow.example.com:443 -servername langflow.example.com | openssl x509 -noout -text
 
 # Test SSL with specific protocol
-openssl s_client -connect langflow.itekk.in:443 -tls1_2
-openssl s_client -connect langflow.itekk.in:443 -tls1_3
+openssl s_client -connect langflow.example.com:443 -tls1_2
+openssl s_client -connect langflow.example.com:443 -tls1_3
 
 # Online SSL test
 # https://www.ssllabs.com/ssltest/
@@ -1378,14 +1378,14 @@ openssl s_client -connect langflow.itekk.in:443 -tls1_3
 sudo apt install apache2-utils -y
 
 # Simple load test
-ab -n 1000 -c 10 http://langflow.itekk.in/
+ab -n 1000 -c 10 http://langflow.example.com/
 
 # Test with keep-alive
-ab -n 1000 -c 10 -k http://langflow.itekk.in/
+ab -n 1000 -c 10 -k http://langflow.example.com/
 
 # More advanced testing with wrk
 sudo apt install wrk -y
-wrk -t4 -c100 -d30s http://langflow.itekk.in/
+wrk -t4 -c100 -d30s http://langflow.example.com/
 ```
 
 ### 6. Check NGINX Status
@@ -1411,13 +1411,13 @@ top -p $(pgrep nginx | tr '\n' ',' | sed 's/,$//')
 sudo openvpn --config client.ovpn
 
 # Test access
-curl http://langflow.itekk.in
-curl http://app1.itekk.in
-curl http://app2.itekk.in
+curl http://langflow.example.com
+curl http://app1.example.com
+curl http://app2.example.com
 
 # Test in browser
-# Open: http://langflow.itekk.in
-# Open: https://langflow.itekk.in (if SSL configured)
+# Open: http://langflow.example.com
+# Open: https://langflow.example.com (if SSL configured)
 ```
 
 ---
@@ -1503,7 +1503,7 @@ sudo systemctl reload nginx
 
 ```bash
 # Check if CORS headers are being sent
-curl -I -H "Origin: http://example.com" http://langflow.itekk.in
+curl -I -H "Origin: http://test.com" http://langflow.example.com
 
 # Ensure CORS headers are in location block, not just server block
 # Add 'always' flag to headers
@@ -1549,10 +1549,10 @@ location / {
 
 ```bash
 # Check certificate validity
-openssl x509 -in /etc/letsencrypt/live/langflow.itekk.in/cert.pem -text -noout
+openssl x509 -in /etc/letsencrypt/live/langflow.example.com/cert.pem -text -noout
 
 # Check certificate expiration
-openssl x509 -in /etc/letsencrypt/live/langflow.itekk.in/cert.pem -noout -dates
+openssl x509 -in /etc/letsencrypt/live/langflow.example.com/cert.pem -noout -dates
 
 # Renew certificate
 sudo certbot renew
@@ -1561,7 +1561,7 @@ sudo certbot renew
 # Trust the certificate on client devices
 
 # Check certificate chain
-openssl s_client -connect langflow.itekk.in:443 -showcerts
+openssl s_client -connect langflow.example.com:443 -showcerts
 ```
 
 ### 6. DNS Not Resolving
@@ -1572,8 +1572,8 @@ openssl s_client -connect langflow.itekk.in:443 -showcerts
 
 ```bash
 # Test DNS resolution
-nslookup langflow.itekk.in
-dig langflow.itekk.in
+nslookup langflow.example.com
+dig langflow.example.com
 
 # Check /etc/hosts file
 cat /etc/hosts
@@ -2149,7 +2149,7 @@ sudo tail -f /var/log/nginx/error.log
 sudo tail -f /var/log/nginx/access.log
 
 # Test connectivity
-curl -I http://langflow.itekk.in
+curl -I http://langflow.example.com
 
 # Test backend
 curl http://192.168.1.10:7860
@@ -2165,10 +2165,10 @@ sudo ss -tlnp | grep nginx
 ps aux | grep nginx
 
 # Test DNS
-nslookup langflow.itekk.in
+nslookup langflow.example.com
 
 # Test SSL
-openssl s_client -connect langflow.itekk.in:443
+openssl s_client -connect langflow.example.com:443
 
 # Check firewall
 sudo ufw status
@@ -2210,10 +2210,10 @@ server {
 
 server {
     listen 443 ssl http2;
-    server_name langflow.itekk.in;
-    
-    ssl_certificate /etc/letsencrypt/live/langflow.itekk.in/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/langflow.itekk.in/privkey.pem;
+    server_name langflow.example.com;
+
+    ssl_certificate /etc/letsencrypt/live/langflow.example.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/langflow.example.com/privkey.pem;
     ssl_protocols TLSv1.2 TLSv1.3;
     
     add_header Strict-Transport-Security "max-age=31536000" always;
@@ -2242,7 +2242,7 @@ server {
 
 server {
     listen 80;
-    server_name langflow.itekk.in;
+    server_name langflow.example.com;
     return 301 https://$server_name$request_uri;
 }
 ```
